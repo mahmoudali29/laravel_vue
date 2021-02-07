@@ -11,7 +11,7 @@
 				<label for="to">To</label>
 				<input type="text" v-model="to" name="to" @keyup.enter="check" class="form-control form-control-sm" placeholder="End date">
 			</div>
-			<button class="btn-secondary btn-block" @click="check">Check!</button>
+			<button class="btn-secondary btn-block" @click="check" :disabled="loading">Check!</button>
 		</div>
 	</div>
 </template>
@@ -31,11 +31,27 @@
 			return {
 				from : null,
 				to : null,
+				loading : false,
+				status : null,
+				errors : null,
 			};
 		},
 		methods:{
 			check(){
-				alert('here we are');
+				this.loading = true;
+				this.errors = null;
+				axios.get(
+					`/api/bookables/${this.$route.params.id}/availability?from=${this.from}&to=${this.to}`
+				).then(response=>{
+					this.status = response.status;  //200
+					 
+				}).catch(error=>{
+					if(422 === error.response.status){
+						this.errors = error.response.data.errors;
+						console.log(errors);
+					}
+					this.status = error.response.status;
+				}).then(()=>(this.loading = false));
 			}
 		},
 	}
