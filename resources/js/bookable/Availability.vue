@@ -4,26 +4,45 @@
 		<div class="form-row">
 			<div class="form-group col-md-6">
 				<label for="from">From</label>
-				<input type="text" v-model="from" name="from" @keyup.enter="check" class="form-control form-control-sm" placeholder="Start date">
+				<input 
+				type="text" 
+				name="from" 
+				class="form-control form-control-sm" 
+				placeholder="Start date" 
+				v-model="from" 
+				@keyup.enter="check" 
+				:class="[{'is-invalid': this.errorFor('from')}]"
+				/>
+				<div 
+					class="invalid-feedback" 
+					v-for="(error,index) in this.errorFor('from')" 
+					:key="'from'+index"
+				>{{ error }}</div>
 			</div>
 
 			<div class="form-group col-md-6">
 				<label for="to">To</label>
-				<input type="text" v-model="to" name="to" @keyup.enter="check" class="form-control form-control-sm" placeholder="End date">
+				<input 
+				type="text"
+				name="to"
+				class="form-control form-control-sm"
+				placeholder="End date" 
+				v-model="to"
+				@keyup.enter="check"  
+				:class="[{'is-invalid': this.errorFor('to')}]"
+				/>
+				<div 
+					class="invalid-feedback" 
+					v-for="(error,index) in this.errorFor('to')" 
+					:key="'to'+index"
+				>{{ error }}</div>
 			</div>
+
 			<button class="btn-secondary btn-block" @click="check" :disabled="loading">Check!</button>
 		</div>
 	</div>
 </template>
 
-<style scoped>
-	label{
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		color: grey;
-		font-weight: bold;
-	}
-</style>
 
 <script>
 	export default{
@@ -48,11 +67,51 @@
 				}).catch(error=>{
 					if(422 === error.response.status){
 						this.errors = error.response.data.errors;
-						console.log(errors);
 					}
 					this.status = error.response.status;
 				}).then(()=>(this.loading = false));
-			}
+			},
+			errorFor(field){
+				if(this.hasErrors && this.errors[field]){
+					return this.errors[field];
+				}else{
+					return null;
+				}
+			},
+		},
+		computed:{
+			hasErrors(){
+				if(this.status===422 && this.errors!==null){
+					return 422;
+				}
+			},
+			hasAvailability(){
+				if(this.status===200){
+					return 200;
+				}
+			},
+			noAvailability(){
+				if(this.status===400){
+					return 400;
+				}
+			},
 		},
 	}
 </script>
+
+
+<style scoped>
+	label{
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		color: grey;
+		font-weight: bold;
+	}
+	.is-invalid{
+		border-color: #b22222;
+		background-image: none; 
+	}
+	.invalid-feedback{
+		color: #b22222;
+	}
+</style>
