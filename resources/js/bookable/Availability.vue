@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<h6 class="text-uppercase text-secondary font-wight-bolder">Check Availability</h6>
+		<h6 class="text-uppercase text-secondary font-wight-bolder">Check Availability
+			<span v-if="noAvailability" class="text-danger">(NOT AVAILABLE)</span>
+			<span v-if="hasAvailability" class="text-success">(AVAILABLE)</span>
+		</h6>
 		<div class="form-row">
 			<div class="form-group col-md-6">
 				<label for="from">From</label>
@@ -91,8 +94,8 @@
 				}
 			},
 			noAvailability(){
-				if(this.status===400){
-					return 400;
+				if(this.status===404){
+					return 404;
 				}
 			},
 		},
